@@ -1,0 +1,62 @@
+○各パラメータ
+--model_name: 事前学習済み埋め込みモデルのHFリポジトリ名。
+--dataset_name: クエリ/ポジティブ/ネガティブ列を持つHFデータセット名。
+--dataset_subset: データセットのサブセットまたはコンフィグ名。
+--dataset_split: 読み込む分割名（例: train）。
+--dataset_dev_split: 任意の開発用分割名（例: dev）。
+--hf_revision: データセットを固定したい場合のリビジョン指定。
+--output_dir: モデル出力やログを保存するディレクトリ。
+--max_length: トークナイズ時の最大シーケンス長。
+--batch_size: 勾配計算前に処理するサンプル数。
+--epochs: データセット全体を何周学習するか。
+--lr: オプティマイザの学習率。
+--temperature: コントラスト学習ロスで使う温度パラメータ。
+--gradient_accumulation: 勾配を蓄積するステップ数。
+--eval_every: 何ステップごとにリコール評価を行うか。
+--seed: 乱数シード（Python/Torch共通）。
+--lora_r: LoRAアダプタのランク。
+--lora_alpha: LoRAのスケーリング係数。
+--lora_dropout: LoRA内部のドロップアウト率。
+--query_prefix: クエリに付与するプレフィックス文字列。
+--doc_prefix: 文書に付与するプレフィックス。
+--fp16: 指定するとFP16訓練を有効化。
+--train_sample_limit: 訓練データの読み込み件数を制限（任意）。
+--dev_sample_limit: dev評価に使うサンプル数上限。
+--max_negs: 1クエリ当たりのネガティブ例数。
+--load_in_8bit: 対応モデルなら8bit量子化でロード。
+
+○最小パラメータ（Colabo稼働）
+!python train_nv_embedqa_lora_colab.py \
+  --output_dir runs/nv8bit_t4_mini_eval \
+  --dataset_name sentence-transformers/msmarco-msmarco-MiniLM-L6-v3 \
+  --dataset_subset triplet \
+  --dataset_split train \
+  --dataset_dev_split dev \
+  --train_sample_limit 500 \
+  --dev_sample_limit 50 \
+  --batch_size 2 \
+  --gradient_accumulation 8 \
+  --max_length 192 \
+  --max_negs 0 \
+  --lora_r 4 \
+  --epochs 1 \
+  --lr 2e-5 \
+  --eval_every 200 \
+  --fp16 \
+  --query_prefix "<|query|> " \
+  --doc_prefix "<|document|> " \
+  --load_in_8bit
+
+
+○推奨パラメータ
+--train_sample_limit 3000 : 全件使い切る前提なら明示指定で取りこぼし防止。
+--dev_sample_limit 300 : 10%程度を軽量評価に回すと過学習の兆候をすばやく把握しやすい。
+--batch_size 32 × --gradient_accumulation 2 : 実効64サンプルで安定しやすく、VRAM 16GBクラスでも収まることが多い。
+--epochs 5 : 3000件なら複数エポック回しても総ステップは少ないため、十分に収束させる。
+--lr 2e-5 : LoRAによる軽量微調整ではこの学習率が破綻しにくく、収束も早い。
+--eval_every 200 : 3000件 / (32×2) ≒ 47ステップ/エポックなので、1エポック中に2〜3回評価できる頻度。
+--lora_r 16, --lora_alpha 32, --lora_dropout 0.05 : 既定値のままで十分だが、よりタスク特化を強くしたいなら lora_r 32 まで挙げてもよい。
+--max_length 512 : 一般的なQA/検索文脈なら十分。長文が多い場合のみ 768〜1024 に増やす。
+--max_negs 1 : サンプル数が限られているので、質の高い負例を1件に絞った方が学習が安定しやすい。
+--fp16 : GPU VRAM を節約しつつ計算を早められるため有効。
+これらを起点に、実際の学習ログで損失やリコールが頭打ちになるようなら lr を少し下げる、過学習の兆候が早期に出るなら lora_dropout を0.1程度まで増やす、といった微調整を行うとよい。
