@@ -1,0 +1,10 @@
+# Secrets & credentials
+env/
+line_ai_group/.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Claude Code local settings
+.claude/settings.local.json

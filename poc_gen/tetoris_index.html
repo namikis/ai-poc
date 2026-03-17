@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-board">
+            <canvas id="gameCanvas" width="200" height="400"></canvas>
+            <div id="gameOverlay" class="game-overlay hidden">
+                <div class="overlay-content">
+                    <h2 id="overlayTitle">GAME OVER</h2>
+                    <p id="overlayMessage">Press R to restart</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="panel-section">
+                <h2>Score</h2>
+                <div id="score" class="stat-value">0</div>
+            </div>
+
+            <div class="panel-section">
+                <h2>Level</h2>
+                <div id="level" class="stat-value">1</div>
+            </div>
+
+            <div class="panel-section">
+                <h2>Lines</h2>
+                <div id="lines" class="stat-value">0</div>
+            </div>
+
+            <div class="panel-section">
+                <h2>Next</h2>
+                <canvas id="nextCanvas" width="80" height="80"></canvas>
+            </div>
+
+            <div class="panel-section controls">
+                <h2>Controls</h2>
+                <div class="control-list">
+                    <div class="control-item">
+                        <span class="key">← →</span>
+                        <span>Move</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">↓</span>
+                        <span>Soft Drop</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">↑ Z</span>
+                        <span>Rotate Left</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">Space X</span>
+                        <span>Rotate Right</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">P</span>
+                        <span>Pause</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">R</span>
+                        <span>Restart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
